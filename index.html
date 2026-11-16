@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Student Management System</title>
+<style>
+:root{--bg:#eef2f5;--panel:#fff;--ink:#14212b;--mute:#5b6b78;--line:#d5dde3;--acc:#0b6e6e;--acc2:#e8f3f3;--bad:#b3261e}
+@media(prefers-color-scheme:dark){:root{--bg:#0f171d;--panel:#18232b;--ink:#e6edf1;--mute:#93a4b0;--line:#2b3a45;--acc:#4fc3c3;--acc2:#173236;--bad:#ff8a80}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,sans-serif}
+main{max-width:1060px;margin:0 auto;padding:28px 16px 48px}
+h1{font:700 30px/1.2 Georgia,serif;margin:0 0 6px}
+h2{font-size:16px;margin:0 0 12px}
+.sub{color:var(--mute);margin:0 0 22px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.stat{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:6px;padding:12px 14px}
+.stat b{display:block;font:700 26px Georgia,serif}
+.stat span{color:var(--mute);font-size:13px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;margin-bottom:18px}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;align-items:end}
+label{font-size:13px;color:var(--mute);display:grid;gap:4px}
+input,select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);width:100%}
+button{font:inherit;padding:8px 14px;border-radius:4px;border:1px solid var(--acc);background:var(--acc);color:#fff;cursor:pointer}
+button.alt{background:transparent;color:var(--acc)}
+button.del{background:transparent;color:var(--bad);border-color:var(--bad)}
+button.sm{padding:3px 9px;font-size:13px}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:600;font-size:13px}
+.tag{padding:2px 8px;border-radius:10px;background:var(--acc2);font-size:12px}
+.bar{height:8px;background:var(--acc);border-radius:4px}
+.top{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+.top input{max-width:none;flex:1;min-width:240px}
+pre{margin:0;white-space:pre-wrap;font:12.5px/1.5 Consolas,monospace;color:var(--mute)}
+#msg{min-height:20px;margin-top:8px;font-size:14px}
+.err{color:var(--bad)}
+</style>
+</head>
+<body>
+<main>
+<h1>Student Management System</h1>
+<p class="sub">Manage student information using SQL Database</p>
+
+<section class="stats" id="stats"></section>
+
+<section class="panel">
+<h2 id="ftitle">Add a New Student</h2>
+<form id="f">
+<input type="hidden" id="rid">
+<label>Student ID<input id="sid" type="number" placeholder="Enter ID" required></label>
+<label>Student Name<input id="sname" placeholder="Enter Name" required></label>
+<label>Department
+<select id="dept">
+<option>CSE</option><option>EEE</option><option>BBA</option><option>Civil</option>
+</select></label>
+<label>Semester<input id="sem" type="number" min="1" required></label>
+<label>Marks<input id="marks" type="number" min="0" max="100" required></label>
+<div>
+<button id="save">Add Student</button>
+<button type="button" class="alt" id="cancel" hidden>Cancel</button>
+</div>
+</form>
+<div id="msg" role="status"></div>
+</section>
+
+<section class="panel">
+<div class="top"><h2>Student Records</h2></div>
+<div class="top">
+<input id="q" type="search" placeholder="Search by ID, Name or Department..." aria-label="Search students">
+</div>
+<div class="wrap">
+<table>
+<thead><tr><th>ID</th><th>Student Name</th><th>Department</th><th>Semester</th><th>Marks</th><th>Actions</th></tr></thead>
+<tbody id="rows"></tbody>
+</table>
+</div>
+</section>
+
+<section class="panel">
+<h2>Department-wise Students</h2>
+<div id="per"></div>
+</section>
+
+<section class="panel">
+<h2>SQL Aggregate Functions</h2>
+<div class="wrap">
+<table>
+<thead><tr><th>Function</th><th>Result</th></tr></thead>
+<tbody id="aggregate"></tbody>
+</table>
+</div>
+</section>
+
+<section class="panel">
+<h2>SQL Queries Used</h2>
+<pre>
+CREATE DATABASE student_management;
+USE student_management;
+
+CREATE TABLE students (
+ id INT PRIMARY KEY,
+ studentname VARCHAR(50),
+ department VARCHAR(50),
+ semester INT,
+ marks INT
+);
+
+INSERT INTO students VALUES
+(1,'Ayesha','CSE',2,88),
+(2,'Sakib','EEE',3,76),
+(3,'Mariya','BBA',1,92),
+(4,'Hasan','CSE',4,81),
+(5,'Nabila','Civil',2,85),
+(6,'Rafi','EEE',5,73),
+(7,'Sumaiya','CSE',3,95),
+(8,'Imran','BBA',4,79),
+(9,'Tania','Civil',1,90),
+(10,'Fahad','EEE',2,84);
+
+SELECT * FROM students;
+SELECT * FROM students WHERE studentname='Ayesha';
+
+UPDATE students SET marks=95 WHERE id=1;
+DELETE FROM students WHERE id=10;
+
+SELECT COUNT(*) FROM students;
+SELECT AVG(marks) FROM students;
+SELECT MAX(marks), MIN(marks) FROM students;
+SELECT department, COUNT(*) FROM students GROUP BY department;
+</pre>
+</section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+<script>
+let db;
+const $ = id => document.getElementById(id);
+
+function q(sql,p=[]){
+  const st=db.prepare(sql);
+  st.bind(p);
+  const out=[];
+  while(st.step()) out.push(st.getAsObject());
+  st.free();
+  return out;
+}
+
+function note(t,bad=false){
+  $('msg').textContent=t;
+  $('msg').className=bad?'err':'';
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g,c=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+const SCHEMA = `
+CREATE TABLE students(
+ id INTEGER PRIMARY KEY,
+ studentname VARCHAR(50),
+ department VARCHAR(50),
+ semester INTEGER,
+ marks INTEGER
+);
+INSERT INTO students VALUES
+(1,'Ayesha','CSE',2,88),
+(2,'Sakib','EEE',3,76),
+(3,'Mariya','BBA',1,92),
+(4,'Hasan','CSE',4,81),
+(5,'Nabila','Civil',2,85),
+(6,'Rafi','EEE',5,73),
+(7,'Sumaiya','CSE',3,95),
+(8,'Imran','BBA',4,79),
+(9,'Tania','Civil',1,90),
+(10,'Fahad','EEE',2,84);
+UPDATE students SET marks=95 WHERE id=1;
+DELETE FROM students WHERE id=10;
+`;
+
+function render(){
+  const s=q(`
+    SELECT COUNT(*) AS total,
+    ROUND(AVG(marks),2) AS avg,
+    MAX(marks) AS highest,
+    MIN(marks) AS lowest
+    FROM students
+  `)[0];
+
+  const items=[
+    ['Total Students',s.total],
+    ['Average Marks',s.avg],
+    ['Highest Marks',s.highest],
+    ['Lowest Marks',s.lowest]
+  ];
+
+  $('stats').innerHTML=items.map(i=>`
+    <div class="stat"><b>${i[1] ?? 0}</b><span>${i[0]}</span></div>
+  `).join('');
+
+  const search='%'+$('q').value.trim()+'%';
+  const rows=q(`
+    SELECT * FROM students
+    WHERE CAST(id AS TEXT) LIKE ?
+    OR studentname LIKE ?
+    OR department LIKE ?
+    ORDER BY id
+  `,[search,search,search]);
+
+  $('rows').innerHTML=rows.length ? rows.map(r=>`
+    <tr>
+      <td>${r.id}</td>
+      <td>${esc(r.studentname)}</td>
+      <td><span class="tag">${esc(r.department)}</span></td>
+      <td>${r.semester}</td>
+      <td>${r.marks}</td>
+      <td>
+        <button class="sm alt" data-e="${r.id}">Edit</button>
+        <button class="sm del" data-d="${r.id}">Delete</button>
+      </td>
+    </tr>
+  `).join('') : '<tr><td colspan="6">No students found.</td></tr>';
+
+  const per=q(`
+    SELECT department,COUNT(*) AS total
+    FROM students GROUP BY department ORDER BY department
+  `);
+  const mx=Math.max(1,...per.map(p=>p.total));
+
+  $('per').innerHTML=per.map(p=>`
+    <div style="display:grid;grid-template-columns:90px 1fr 30px;gap:10px;align-items:center;margin:10px 0">
+      <span>${esc(p.department)}</span>
+      <div class="bar" style="width:${p.total/mx*100}%"></div>
+      <b>${p.total}</b>
+    </div>
+  `).join('');
+
+  $('aggregate').innerHTML=`
+    <tr><td>COUNT(*)</td><td>${s.total}</td></tr>
+    <tr><td>AVG(marks)</td><td>${s.avg}</td></tr>
+    <tr><td>MAX(marks)</td><td>${s.highest}</td></tr>
+    <tr><td>MIN(marks)</td><td>${s.lowest}</td></tr>
+  `;
+}
+
+function reset(){
+  $('f').reset();
+  $('rid').value='';
+  $('ftitle').textContent='Add a New Student';
+  $('save').textContent='Add Student';
+  $('cancel').hidden=true;
+}
+
+$('f').onsubmit=e=>{
+  e.preventDefault();
+  try{
+    const id=+$('sid').value;
+    const name=$('sname').value.trim();
+    const dept=$('dept').value;
+    const sem=+$('sem').value;
+    const marks=+$('marks').value;
+
+    if(sem<1 || marks<0 || marks>100){
+      note('Please enter valid semester and marks.',true);
+      return;
+    }
+
+    if($('rid').value){
+      q(`UPDATE students SET id=?,studentname=?,department=?,semester=?,marks=? WHERE id=?`,
+        [id,name,dept,sem,marks,+$('rid').value]);
+      note('Student information updated successfully.');
+    }else{
+      q(`INSERT INTO students (id,studentname,department,semester,marks) VALUES(?,?,?,?,?)`,
+        [id,name,dept,sem,marks]);
+      note('New student added successfully.');
+    }
+    reset();
+    render();
+  }catch(x){
+    note(String(x.message).includes('UNIQUE') ?
+      'Student ID already exists.' : x.message,true);
+  }
+};
+
+$('cancel').onclick=()=>{reset();note('');};
+$('q').oninput=render;
+
+$('rows').onclick=e=>{
+  const d=e.target.dataset.d;
+  const ed=e.target.dataset.e;
+
+  if(d && confirm('Delete student ID '+d+'?')){
+    q('DELETE FROM students WHERE id=?',[+d]);
+    note('Student deleted successfully.');
+    render();
+  }
+
+  if(ed){
+    const r=q('SELECT * FROM students WHERE id=?',[+ed])[0];
+    $('rid').value=r.id;
+    $('sid').value=r.id;
+    $('sname').value=r.studentname;
+    $('dept').value=r.department;
+    $('sem').value=r.semester;
+    $('marks').value=r.marks;
+    $('ftitle').textContent='Edit Student Information';
+    $('save').textContent='Save Changes';
+    $('cancel').hidden=false;
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+};
+
+initSqlJs({
+  locateFile:f=>'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/'+f
+}).then(SQL=>{
+  db=new SQL.Database();
+  db.exec(SCHEMA);
+  render();
+}).catch(()=>{
+  note('Could not load SQL engine. Check internet connection.',true);
+});
+</script>
+</body>
+</html>
